@@ -34,7 +34,10 @@
       "eas": {
         "projectId": "298e56c3-b717-40ef-8280-fca968409df8"
       }
-    }
+    },
+    "plugins": [
+      "@react-native-firebase/app"
+    ]
   },
   "react-native-google-mobile-ads": {
     "android_app_id": "ca-app-pub-7815580729420007~6001069744",
