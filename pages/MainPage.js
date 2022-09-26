@@ -12,6 +12,17 @@ import { firebase_db } from "../firebaseConfig";
 import Card from "../components/Card";
 import data from "../data.json";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+import {
+  BannerAd,
+  BannerAdSize,
+  TestIds,
+  InterstitialAd,
+  AdEventType,
+  RewardedInterstitialAd,
+  RewardedAdEventType,
+} from "react-native-google-mobile-ads";
+
 let participants = data.info.participants;
 
 export default function MainPage({ navigation }) {
@@ -44,12 +55,25 @@ export default function MainPage({ navigation }) {
           </TouchableOpacity>
         </View>
         <View style={styles.myPageGroup}>
-          <TouchableOpacity style = {styles.myButton} onPress={()=>{navigation.navigate("SearchPage")}}>
+          <TouchableOpacity
+            style={styles.myButton}
+            onPress={() => {
+              navigation.navigate("SearchPage");
+            }}
+          >
             <Text style={styles.myPageButtonText}> 써치 </Text>
           </TouchableOpacity>
         </View>
+        <View>
+          <BannerAd
+            unitId={TestIds.BANNER}
+            size={BannerAdSize.LARGE_BANNER}
+            requestOptions={{
+              requestNonPersonalizedAdsOnly: true,
+            }}
+          />
+        </View>
         <View style={styles.cardContainer}>
-      
           {participants.map((content, i) => {
             return <Card content={content} key={i} />;
           })}
@@ -62,7 +86,6 @@ export default function MainPage({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: "white",
-
   },
   containerSafe: {
     backgroundColor: "white",
