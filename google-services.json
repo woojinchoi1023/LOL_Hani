@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "29645057276",
+    "firebase_url": "https://numullbo-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "numullbo",
+    "storage_bucket": "numullbo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:29645057276:android:2f56c97946e3cd6216fb79",
+        "android_client_info": {
+          "package_name": "com.karinarang.numullbo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "29645057276-lpthnnn9dv1ee8qbmpmlnbsva17esc0c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCrt1Ty6bSzeJGGIy_juQcOsjTDMJsMO98"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "29645057276-lpthnnn9dv1ee8qbmpmlnbsva17esc0c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
