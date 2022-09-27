@@ -14,7 +14,7 @@ export default function MyPage() {
 
   let  userId = Application.androidId;
 
-  let  riotApiKey = 'RGAPI-1cb9722d-9716-486c-b481-fa5786e38437';
+  let  riotApiKey = 'RGAPI-84377366-3592-4394-8ca7-180286a8bb65';
 
   const [apiData, setApiData] = useState([]);
 

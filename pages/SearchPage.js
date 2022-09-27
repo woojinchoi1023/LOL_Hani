@@ -17,9 +17,10 @@ export default function SearchPage() {
     const [valv, setValue] = useState([])
 
     
-    let  riotApiKey = 'RGAPI-1cb9722d-9716-486c-b481-fa5786e38437';
+    let  riotApiKey = 'RGAPI-84377366-3592-4394-8ca7-180286a8bb65';
 
     const [apiData, setApiData] = useState([]);
+    const [matchData, setMatchData] = useState([]);
 
     let sohwan = "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" +valv +'?api_key=' + riotApiKey
 
@@ -27,6 +28,14 @@ export default function SearchPage() {
         axios.get(sohwan).then((response) => {
             setApiData(response.data)
         })
+    }
+
+    let matchID = "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/"+apiData.puuid+"/ids"+'?api_key=' + riotApiKey + '&start=0&count=20'
+    const getMatchData = () => {
+      axios.get(matchID).then((response)=> {
+        console.log(response)
+        setMatchData(response.data)
+      })
     }
 
 
@@ -46,6 +55,9 @@ export default function SearchPage() {
             <Text> {valv} </Text>
             <Text> {apiData.puuid}</Text>
             <Text style={{fontSize:30, color:'red', fontWeight:'bold'}}> {apiData.summonerLevel}</Text>
+            <TouchableOpacity onPress={()=>{getMatchData()}}><Text>매치검색!</Text></TouchableOpacity>
+            <Text>{matchData}</Text>
+
             
 
         </ScrollView>
