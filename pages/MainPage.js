@@ -73,11 +73,11 @@ export default function MainPage({ navigation }) {
             }}
           />
         </View>
-        <View style={styles.cardContainer}>
+        {/* <View style={styles.cardContainer}>
           {participants.map((content, i) => {
             return <Card content={content} key={i} />;
           })}
-        </View>
+        </View> */}
       </ScrollView>
     </SafeAreaView>
   );
