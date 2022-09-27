@@ -10,8 +10,8 @@ import {
 import * as Application from "expo-application";
 import { firebase_db } from "../firebaseConfig";
 import Card from "../components/Card";
-import data from "../data.json";
 import { SafeAreaView } from "react-native-safe-area-context";
+// import data from "../data.json";
 
 import {
   BannerAd,
@@ -23,10 +23,24 @@ import {
   RewardedAdEventType,
 } from "react-native-google-mobile-ads";
 
-let participants = data.info.participants;
+// let participants = data.info.participants;
 
 export default function MainPage({ navigation }) {
   const userId = Application.androidId;
+  
+  const [totalData, setTotalData] = useState([])
+
+
+  const dataReady = () => {
+   firebase_db.ref('/userMatchData/' + userId).once('value').then((snapshot)=>{
+    let temp = snapshot.val()
+    setTotalData(Object.values(temp))
+    console.log('데이터준비완료 !!!!')
+   })
+  
+  }
+
+
 
   useEffect(() => {
     navigation.setOptions({
@@ -37,14 +51,21 @@ export default function MainPage({ navigation }) {
         color: "red",
       },
     });
+
+  //   firebase_db.ref("usersData/" + userId).once("value").then((snapshot) => {
+  //   let fav = snapshot.val();
+  //   let fav_list = Object.keys(fav);
+  //   let fav_id = Object.values(fav);
+  // })
+
   });
 
   return (
     <SafeAreaView style={styles.containerSafe}>
+      
       <ScrollView style={styles.container}>
         {/* <Text style={styles.title}>누물보?</Text> */}
         <View style={styles.myPageGroup}>
-          <Text style={styles.text1}> Hi, {userId}</Text>
           <TouchableOpacity
             style={styles.myButton}
             onPress={() => {
@@ -53,8 +74,6 @@ export default function MainPage({ navigation }) {
           >
             <Text style={styles.myPageButtonText}>MyPage</Text>
           </TouchableOpacity>
-        </View>
-        <View style={styles.myPageGroup}>
           <TouchableOpacity
             style={styles.myButton}
             onPress={() => {
@@ -64,7 +83,7 @@ export default function MainPage({ navigation }) {
             <Text style={styles.myPageButtonText}> 써치 </Text>
           </TouchableOpacity>
         </View>
-        <View>
+        <View style={{alignItems:'center', marginVertical:20}}>
           <BannerAd
             unitId={TestIds.BANNER}
             size={BannerAdSize.LARGE_BANNER}
@@ -73,6 +92,17 @@ export default function MainPage({ navigation }) {
             }}
           />
         </View>
+        <View style={styles.myPageGroup}>
+          <TouchableOpacity style={styles.myButton} onPress={()=>{dataReady()}}><Text style={styles.myPageButtonText}>LOAD DATA</Text></TouchableOpacity>
+        </View>
+        <View style={styles.cardContainer}>
+          {totalData.map((content,i) => {
+            let date = Date(content.info.gameEndTimestamp * 1000)
+
+            return <Text key={i}>{content.info.gameEndTimestamp}</Text>
+          })}
+        </View>
+        
         {/* <View style={styles.cardContainer}>
           {participants.map((content, i) => {
             return <Card content={content} key={i} />;

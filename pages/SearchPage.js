@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ScrollView,
   TextInput,
+  Keyboard,
 } from "react-native";
 import * as Application from "expo-application";
 import axios from "axios";
@@ -51,6 +52,23 @@ export default function SearchPage() {
     firebase_db.ref("users/" + userId + "/" + valv).set(apiData.puuid);
   };
 
+
+  const loadMatchCode = (puuid,k) => {
+    axios.get("https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids" +
+    "?api_key=" +
+    riotApiKey +
+    "&start=0&count=3" ).then((response) => {
+      let loadData = Object.values(response.data)
+
+      loadData.map((content)=>{
+        firebase_db.ref().child("userData").child(userId).child(content).set(k)
+      })
+
+    })
+  }
+
+
+
   const getFav = () => {
     firebase_db
       .ref("users/" + userId)
@@ -58,14 +76,42 @@ export default function SearchPage() {
       .then((snapshot) => {
         let fav = snapshot.val();
         let fav_list = Object.keys(fav);
+        let fav_id = Object.values(fav);
+
+        firebase_db.ref("userData/"+userId).remove() // 초기화
+
+        fav_id.map((content,i)=>{
+          loadMatchCode(content,fav_list[i])
+          console.log('매치코드 추가 끝')
+        })
+        
         if (fav_list && fav_list.length > 0) {
           setMyFav(fav_list);
           setReady(true);
         } else {
           console.log("불러오기실패");
         }
+
+        
       });
   };
+
+  let getMatchDataUrl = 'https://asia.api.riotgames.com/lol/match/v5/matches/'
+  const AboutMatch = (matchId) => {
+    axios.get(getMatchDataUrl+matchId+"?api_key=" + riotApiKey).then((response)=>{
+      let data = response.data
+      firebase_db.ref().child("userMatchData").child(userId).child(matchId).set(data)
+    });
+  };
+
+  const MatchDataLoading = () => {
+    firebase_db.ref("userData/" + userId).once("value").then((snapshot) => {
+      let matchList = Object.keys(snapshot.val())
+      matchList.map((matchCode)=> {
+        AboutMatch(matchCode)
+      })
+    })
+  }
 
   useEffect(() => {}, []);
 
@@ -118,6 +164,9 @@ export default function SearchPage() {
         ) : (
           <Text>찜 목록이 비었습니다</Text>
         )}
+      <TouchableOpacity style={styles.searchButton} onPress={()=>{MatchDataLoading()}}>
+          <Text> 실행 </Text>
+      </TouchableOpacity>
       </ScrollView>
     </SafeAreaView>
   );
