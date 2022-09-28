@@ -49,7 +49,7 @@ export default function MainPage({ navigation }) {
 
   useEffect(() => {
     navigation.setOptions({
-      title: "롤하니 : 친구들의 전적을 모아",
+      title: "롤추적기 : 자기야 어제 게임했어?",
       headerTitleStyle: {
         fontSize: 25,
         fontWeight: "bold",
@@ -63,7 +63,7 @@ export default function MainPage({ navigation }) {
   //   let fav_id = Object.values(fav);
   // })
 
-  });
+  },[]);
 
   return (
     <SafeAreaView style={styles.containerSafe}>
@@ -101,7 +101,7 @@ export default function MainPage({ navigation }) {
           <TouchableOpacity style={styles.myButton} onPress={()=>{dataReady()}}><Text style={styles.myPageButtonText}>LOAD DATA</Text></TouchableOpacity>
         </View>
         <View style={styles.cardContainer}>
-          {totalData.map((content,i) => {
+          {/* {totalData.map((content,i) => {
             let date = new Date(content.info.gameEndTimestamp + 9 * 60 * 60 * 1000)
             let dM = (date.getMonth() + 1).toString()
             let dD = date.getDate().toString()
@@ -110,10 +110,14 @@ export default function MainPage({ navigation }) {
             let dateString = dM + '월' + dD + '일 ' + dH + '시' + dMin + '분'
             
 
-            return <Text key={i}>{dateString}</Text>
-            // return <Text key={i}>{date}</Text>
+            return <Text key={i}>{dateString}</Text> 
+                   })}*/}
+
+            {totalData.map((content,i) => {
+              return <Match content={content} key={i} navigation={navigation} />;
+            })}
             
-          })}
+   
         </View>
         
         {/* <View style={styles.cardContainer}>
