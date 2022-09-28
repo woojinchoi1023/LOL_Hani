@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import * as Application from "expo-application";
 import { firebase_db } from "../firebaseConfig";
-import Card from "../components/Card";
+import Match from "../components/Match";
 import { SafeAreaView } from "react-native-safe-area-context";
 // import data from "../data.json";
 
@@ -30,11 +30,16 @@ export default function MainPage({ navigation }) {
   
   const [totalData, setTotalData] = useState([])
 
+  const timestampDate = (timestamp) => {
+    let date = new Date(timestamp)
+  }
+
 
   const dataReady = () => {
    firebase_db.ref('/userMatchData/' + userId).once('value').then((snapshot)=>{
     let temp = snapshot.val()
-    setTotalData(Object.values(temp))
+    setTotalData(Object.values(temp).reverse())
+    
     console.log('데이터준비완료 !!!!')
    })
   
@@ -97,9 +102,17 @@ export default function MainPage({ navigation }) {
         </View>
         <View style={styles.cardContainer}>
           {totalData.map((content,i) => {
-            let date = Date(content.info.gameEndTimestamp * 1000)
+            let date = new Date(content.info.gameEndTimestamp + 9 * 60 * 60 * 1000)
+            let dM = (date.getMonth() + 1).toString()
+            let dD = date.getDate().toString()
+            let dH = date.getHours().toString()
+            let dMin = date.getMinutes().toString()
+            let dateString = dM + '월' + dD + '일 ' + dH + '시' + dMin + '분'
+            
 
-            return <Text key={i}>{content.info.gameEndTimestamp}</Text>
+            return <Text key={i}>{dateString}</Text>
+            // return <Text key={i}>{date}</Text>
+            
           })}
         </View>
         

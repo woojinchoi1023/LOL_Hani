@@ -20,7 +20,7 @@ export default function SearchPage() {
   const [myFav, setMyFav] = useState([]);
   const [ready, setReady] = useState(false);
 
-  let riotApiKey = "RGAPI-84377366-3592-4394-8ca7-180286a8bb65";
+  let riotApiKey = "RGAPI-366949be-b1d4-411d-86cf-6cee41924185";
 
   const [apiData, setApiData] = useState([]);
   const [matchData, setMatchData] = useState([]);
@@ -108,6 +108,7 @@ export default function SearchPage() {
     firebase_db.ref("userData/" + userId).once("value").then((snapshot) => {
       let matchList = Object.keys(snapshot.val())
       matchList.map((matchCode)=> {
+        firebase_db.ref().child("userMatchData").child(userId).set(null)
         AboutMatch(matchCode)
       })
     })
