@@ -92,9 +92,9 @@ export default function FollowPage({ route }) {
             <Text style={{ fontSize: 30, color: "red", fontWeight: "bold" }}>
             레벨: {bigData.summonerLevel}
           </Text>
-          <TouchableOpacity style={styles.searchButton} onPress={()=>{addFollow();}}>
-            <Text>팔로우하기</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.searchButton} onPress={()=>{addFollow();}}>
+                <Text>팔로우하기</Text>
+            </TouchableOpacity>
         </View>
         <View>
             {followNames.map((content,i)=>{

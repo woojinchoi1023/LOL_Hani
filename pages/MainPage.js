@@ -83,7 +83,7 @@ export default function MainPage({ navigation }) {
           <TouchableOpacity
             style={styles.myButton}
             onPress={() => {
-              navigation.navigate("SearchPage",{ID: userId});
+              navigation.navigate("FollowPage",{ID: userId});
             }}
           >
             <Text style={styles.myPageButtonText}>팔로우</Text>
@@ -107,9 +107,6 @@ export default function MainPage({ navigation }) {
           />
           <TouchableOpacity onPress={()=>{clearAll()}}>
             <Text> clear all </Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.myButton} onPress={()=>{navigation.navigate('FollowPage',{ID:userId})}}>
-            <Text style={styles.myPageButtonText}>follow page</Text>
           </TouchableOpacity>
         </View>
 

@@ -41,7 +41,6 @@ export default function Follow({ content, ID, followNames, setFollowNames }) {
         <TouchableOpacity style={styles.deleteButton} onPress={()=>{delFollow()}}>
             <Text>삭제</Text>
         </TouchableOpacity>
-        <Text>{followNames}</Text>
     </View>
     
   )
