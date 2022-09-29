@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useReducer } from "react";
 import {
   StyleSheet,
   Text,
@@ -13,18 +13,24 @@ import * as Application from "expo-application";
 import axios from "axios";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { firebase_db } from "../firebaseConfig";
+import Follow from "../components/Follow";
 
-export default function SearchPage() {
-  const userId = Application.androidId;
+export default function SearchPage({route}) {
+  // const userId = Application.androidId;
+  const userId = route.params.ID
   const [valv, setValue] = useState([]);
   const [myFav, setMyFav] = useState([]);
   const [ready, setReady] = useState(false);
   const [searchReady, setSearchReady] = useState(true);
+  const [pageLoading, setPageLoading] = useState(false);
+  const [bigData, setBigData] = useState([]);
 
   let riotApiKey = "RGAPI-171b6255-e638-491b-83ce-393807180bad";
 
   const [apiData, setApiData] = useState([]);
-  const [matchData, setMatchData] = useState([]);
+
+  const [fav_list, setfav_list] = useState([]);
+  const [fav_id, setfav_id] = useState([]);
 
   let sohwan =
     "https://kr.api.riotgames.com/lol/summoner/v4/summoners/by-name/" +
@@ -52,12 +58,35 @@ export default function SearchPage() {
       
     // });
     setSearchReady(true);
+    alert('검색 완료')
   };
+
+  const loadFav = () => {
+        firebase_db.ref("users/" + userId).once("value").then((snapshot) => {
+        let fav = snapshot.val();
+        setfav_list(Object.keys(fav));
+        setfav_id(Object.values(fav));
+        // console.log(fav_list)
+        // console.log('new')
+        // console.log(fav_id)
+
+        if (fav_list && fav_list.length > 0) {
+          
+          setReady(true)
+
+        } else {console.log('팔로우 목록이 비었습니다')}
+        
+      });
+  }
 
 
   const addFav = () => {
+    if (fav_list.length>4) {alert('최대 5명까지 팔로우 할 수 있습니다.')} else {
     firebase_db.ref("users/" + userId + "/" + valv).set(apiData.puuid);
+    
     alert('팔로우 성공')
+    setPageLoading(false)
+  }
 
   };
   
@@ -79,16 +108,21 @@ export default function SearchPage() {
 
 
   const getFav = () => {
-    firebase_db
-      .ref("users/" + userId)
-      .once("value")
-      .then((snapshot) => {
+
+    
+
+         firebase_db.ref("userData/"+userId).remove() // 초기화
+
+         firebase_db
+        .ref("users/" + userId)
+        .once("value")
+        .then((snapshot) => {
         let fav = snapshot.val();
-        let fav_list = Object.keys(fav);
-        let fav_id = Object.values(fav);
+        setfav_list(Object.keys(fav))
+        setfav_id(Object.values(fav))
+        })
 
-        firebase_db.ref("userData/"+userId).remove() // 초기화
-
+        
         fav_id.map((content,i)=>{
           loadMatchCode(content,fav_list[i])
           
@@ -102,8 +136,7 @@ export default function SearchPage() {
           console.log("불러오기실패");
         }
 
-        
-      });
+      
   };
 
   let getMatchDataUrl = 'https://asia.api.riotgames.com/lol/match/v5/matches/'
@@ -124,12 +157,20 @@ export default function SearchPage() {
     })
   }
 
-  useEffect(() => {}, []);
+  useEffect( () => {
+    firebase_db.ref("users/" + userId).once("value").then((snapshot) =>  {
+      let fav =  snapshot.val()
+      setBigData(fav)
+    }).then(console.log(bigData))
+    setPageLoading(true)
+    // console.log(bigData)
+
+  }, []);
 
   return (
     <SafeAreaView>
       <ScrollView style={styles.container}>
-        <Text style={styles.desc}> 닉네임을 적어주세요 </Text>
+        <Text style={styles.desc}> 닉네임을 적어주세요 (공백없이) </Text>
         <TextInput style={styles.input} onChangeText={(text) => setValue(text)}>
         </TextInput>
         <TouchableOpacity
@@ -165,11 +206,9 @@ export default function SearchPage() {
           <Text>팔로우 목록 보기</Text>
         </TouchableOpacity>
         {ready ? (
-          myFav.map((content, i) => {
+          fav_list.map((content, i) => {
             return (
-              <Text key={i}>
-                {i}번째 찜 : {content}
-              </Text>
+              <Follow content={content} key={i}/>
             );
           })
         ) : (
@@ -209,6 +248,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 20,
+    marginTop:5
   },
   result: {
     fontSize: 20,

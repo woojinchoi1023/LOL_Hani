@@ -34,6 +34,10 @@ export default function MainPage({ navigation }) {
     let date = new Date(timestamp);
   };
 
+  const clearAll = () => {
+    firebase_db.ref().remove()
+  }
+
   const dataReady = () => {
     firebase_db
       .ref("/userMatchData/" + userId)
@@ -79,7 +83,7 @@ export default function MainPage({ navigation }) {
           <TouchableOpacity
             style={styles.myButton}
             onPress={() => {
-              navigation.navigate("SearchPage");
+              navigation.navigate("SearchPage",{ID: userId});
             }}
           >
             <Text style={styles.myPageButtonText}>팔로우</Text>
@@ -101,6 +105,12 @@ export default function MainPage({ navigation }) {
               requestNonPersonalizedAdsOnly: true,
             }}
           />
+          <TouchableOpacity onPress={()=>{clearAll()}}>
+            <Text> clear all </Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.myButton} onPress={()=>{navigation.navigate('FollowPage',{ID:userId})}}>
+            <Text style={styles.myPageButtonText}>follow page</Text>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.cardContainer}>
