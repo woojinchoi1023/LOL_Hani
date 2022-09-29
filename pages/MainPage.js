@@ -27,25 +27,24 @@ import {
 
 export default function MainPage({ navigation }) {
   const userId = Application.androidId;
-  
-  const [totalData, setTotalData] = useState([])
+
+  const [totalData, setTotalData] = useState([]);
 
   const timestampDate = (timestamp) => {
-    let date = new Date(timestamp)
-  }
-
+    let date = new Date(timestamp);
+  };
 
   const dataReady = () => {
-   firebase_db.ref('/userMatchData/' + userId).once('value').then((snapshot)=>{
-    let temp = snapshot.val()
-    setTotalData(Object.values(temp).reverse())
-    
-    console.log('데이터준비완료 !!!!')
-   })
-  
-  }
+    firebase_db
+      .ref("/userMatchData/" + userId)
+      .once("value")
+      .then((snapshot) => {
+        let temp = snapshot.val();
+        setTotalData(Object.values(temp).reverse());
 
-
+        console.log("데이터준비완료 !!!!");
+      });
+  };
 
   useEffect(() => {
     navigation.setOptions({
@@ -57,38 +56,44 @@ export default function MainPage({ navigation }) {
       },
     });
 
-  //   firebase_db.ref("usersData/" + userId).once("value").then((snapshot) => {
-  //   let fav = snapshot.val();
-  //   let fav_list = Object.keys(fav);
-  //   let fav_id = Object.values(fav);
-  // })
-
-  },[]);
+    //   firebase_db.ref("usersData/" + userId).once("value").then((snapshot) => {
+    //   let fav = snapshot.val();
+    //   let fav_list = Object.keys(fav);
+    //   let fav_id = Object.values(fav);
+    // })
+  }, []);
 
   return (
     <SafeAreaView style={styles.containerSafe}>
-      
       <ScrollView style={styles.container}>
         {/* <Text style={styles.title}>누물보?</Text> */}
         <View style={styles.myPageGroup}>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             style={styles.myButton}
             onPress={() => {
               navigation.navigate("MyPage");
             }}
           >
             <Text style={styles.myPageButtonText}>MyPage</Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             style={styles.myButton}
             onPress={() => {
               navigation.navigate("SearchPage");
             }}
           >
-            <Text style={styles.myPageButtonText}> 써치 </Text>
+            <Text style={styles.myPageButtonText}>팔로우</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.myButton}
+            onPress={() => {
+              dataReady();
+            }}
+          >
+            <Text style={styles.myPageButtonText}>검색</Text>
           </TouchableOpacity>
         </View>
-        <View style={{alignItems:'center', marginVertical:20}}>
+        <View style={{ alignItems: "center", marginVertical: 20 }}>
           <BannerAd
             unitId={TestIds.BANNER}
             size={BannerAdSize.LARGE_BANNER}
@@ -97,9 +102,7 @@ export default function MainPage({ navigation }) {
             }}
           />
         </View>
-        <View style={styles.myPageGroup}>
-          <TouchableOpacity style={styles.myButton} onPress={()=>{dataReady()}}><Text style={styles.myPageButtonText}>LOAD DATA</Text></TouchableOpacity>
-        </View>
+
         <View style={styles.cardContainer}>
           {/* {totalData.map((content,i) => {
             let date = new Date(content.info.gameEndTimestamp + 9 * 60 * 60 * 1000)
@@ -113,13 +116,11 @@ export default function MainPage({ navigation }) {
             return <Text key={i}>{dateString}</Text> 
                    })}*/}
 
-            {totalData.map((content,i) => {
-              return <Match content={content} key={i} navigation={navigation} />;
-            })}
-            
-   
+          {totalData.map((content, i) => {
+            return <Match content={content} key={i} navigation={navigation} />;
+          })}
         </View>
-        
+
         {/* <View style={styles.cardContainer}>
           {participants.map((content, i) => {
             return <Card content={content} key={i} />;

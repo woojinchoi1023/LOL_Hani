@@ -19,8 +19,9 @@ export default function SearchPage() {
   const [valv, setValue] = useState([]);
   const [myFav, setMyFav] = useState([]);
   const [ready, setReady] = useState(false);
+  const [searchReady, setSearchReady] = useState(true);
 
-  let riotApiKey = "RGAPI-366949be-b1d4-411d-86cf-6cee41924185";
+  let riotApiKey = "RGAPI-171b6255-e638-491b-83ce-393807180bad";
 
   const [apiData, setApiData] = useState([]);
   const [matchData, setMatchData] = useState([]);
@@ -39,19 +40,27 @@ export default function SearchPage() {
     "&start=0&count=3";
 
   const getData = async () => {
-    await axios.get(sohwan).then((response) => {
+    setSearchReady(false);
+    axios.get(sohwan).catch(error => {alert('없는 소환사명입니다')}).then((response) => {
       setApiData(response.data);
     });
 
-    await axios.get(matchID).then((response) => {
-      // console.log(response)
-      setMatchData(response.data);
-    });
-  };
-  const addFav = () => {
-    firebase_db.ref("users/" + userId + "/" + valv).set(apiData.puuid);
+    // await axios.get(matchID).then((response) => {
+    //   // console.log(response)
+    //   setMatchData(response.data);
+    //   console.log(valv + ' 매치데이터 가져오기 완료')
+      
+    // });
+    setSearchReady(true);
   };
 
+
+  const addFav = () => {
+    firebase_db.ref("users/" + userId + "/" + valv).set(apiData.puuid);
+    alert('팔로우 성공')
+
+  };
+  
 
   const loadMatchCode = (puuid,k) => {
     axios.get("https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/" + puuid + "/ids" +
@@ -82,12 +91,13 @@ export default function SearchPage() {
 
         fav_id.map((content,i)=>{
           loadMatchCode(content,fav_list[i])
-          console.log('매치코드 추가 끝')
+          
         })
         
         if (fav_list && fav_list.length > 0) {
           setMyFav(fav_list);
           setReady(true);
+          console.log('매치코드 추가 끝');
         } else {
           console.log("불러오기실패");
         }
@@ -121,43 +131,43 @@ export default function SearchPage() {
       <ScrollView style={styles.container}>
         <Text style={styles.desc}> 닉네임을 적어주세요 </Text>
         <TextInput style={styles.input} onChangeText={(text) => setValue(text)}>
-          {" "}
         </TextInput>
         <TouchableOpacity
           style={styles.searchButton}
           onPress={() => {
             getData();
+            
           }}
         >
-          <Text>검색!</Text>
+          {searchReady ? <Text>검색!</Text>: <Text>로딩중</Text>}
         </TouchableOpacity>
-        <Text style={styles.result}> {valv} 님의 정보입니다 : </Text>
-        <Text> {apiData.puuid}</Text>
-        <Text style={{ fontSize: 30, color: "red", fontWeight: "bold" }}>
-          {" "}
-          레벨: {apiData.summonerLevel}
-        </Text>
+        <View style={{marginBottom:10}}>
+          <Text style={styles.result}> {valv} 님의 정보입니다 : </Text>
+          <Text style={{ fontSize: 30, color: "red", fontWeight: "bold" }}>
+            {" "}
+            레벨: {apiData.summonerLevel}
+          </Text>
+        </View>
         <TouchableOpacity
           style={styles.searchButton}
           onPress={() => {
             addFav();
           }}
         >
-          <Text>찜 추가</Text>
+          <Text>팔로우하기</Text>
         </TouchableOpacity>
-        <Text style={{ marginTop: 20 }}>{matchData}</Text>
         <TouchableOpacity
           style={styles.searchButton}
           onPress={() => {
             getFav();
           }}
         >
-          <Text>찜 불러오기</Text>
+          <Text>팔로우 목록 보기</Text>
         </TouchableOpacity>
         {ready ? (
           myFav.map((content, i) => {
             return (
-              <Text>
+              <Text key={i}>
                 {i}번째 찜 : {content}
               </Text>
             );
@@ -203,7 +213,7 @@ const styles = StyleSheet.create({
   result: {
     fontSize: 20,
     marginTop: 20,
-    color: "blue",
+    color: "black",
     fontWeight: "bold",
   },
 });
