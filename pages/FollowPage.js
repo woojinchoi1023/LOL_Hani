@@ -15,7 +15,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { firebase_db } from "../firebaseConfig";
 import Follow from "../components/Follow";
 
-export default function FollowPage({ route }) {
+export default function FollowPage({ navigation, route }) {
   const userId = route.params.ID;
   const [nickname, setNickName] = useState("");
   const [bigData, setBigData] = useState([]);
@@ -96,6 +96,7 @@ export default function FollowPage({ route }) {
       alert("최대 5명까지 팔로우 할 수 있습니다.");
     } else {
       firebase_db.ref("users/" + userId + "/" + nickname).set(bigData.puuid);
+      // navigation.navigate('MainPage',{favorite:nickname})
       alert("팔로우 성공");
     }
 

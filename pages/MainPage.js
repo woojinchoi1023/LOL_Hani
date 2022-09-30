@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Component } from "react";
 import {
   StyleSheet,
   Text,
@@ -12,6 +12,8 @@ import { firebase_db } from "../firebaseConfig";
 import Match from "../components/Match";
 import { SafeAreaView } from "react-native-safe-area-context";
 import axios from "axios";
+import { useIsFocused } from '@react-navigation/native';
+
 
 // import data from "../data.json";
 
@@ -27,16 +29,20 @@ import {
 
 // let participants = data.info.participants;
 
-export default function MainPage({ navigation }) {
+export default function MainPage({ navigation, route }) {
   const userId = Application.androidId;
   const [totalData, setTotalData] = useState([]);
   
   const [fav_list, setfav_list] = useState([]);
   const [fav_id, setfav_id] = useState([]);
+  const [pageReady, setPageReady] = useState(true);
+  const isFocused = useIsFocused();
 
   let riotApiKey = "RGAPI-1de6a553-746c-49bc-ab40-546c6d6ed8a9";
 
-  let async = require("async");
+ 
+
+
 
 
 
@@ -60,6 +66,8 @@ export default function MainPage({ navigation }) {
   }
 
   const getFav = () => {
+    setPageReady(false); //버튼 텍스트용
+
     firebase_db.ref("userData/"+userId).remove() // 초기화
 
     firebase_db
@@ -67,8 +75,15 @@ export default function MainPage({ navigation }) {
    .once("value")
    .then((snapshot) => {
    let fav = snapshot.val();
-   setfav_list(Object.keys(fav))
-   setfav_id(Object.values(fav))
+   if (fav===null) {
+    console.log('getfav 오류')
+   } else {
+    setTimeout(()=>
+      setfav_list(Object.keys(fav)),100)
+    setfav_id(Object.values(fav))
+    
+  }
+  
    })
 
    
@@ -115,20 +130,12 @@ export default function MainPage({ navigation }) {
         setTotalData(Object.values(temp).reverse());
 
         console.log("데이터준비완료 !!!!");
-      });
-  };
+        alert('전적을 불러왔습니다')
 
-  const completePack = () => {
-    async.waterfall([
-      getFav,
-      MatchDataLoading,
-      dataReady
-    ], function (err, result) {
-      if(err)
-      console.log(err);
-  else
-      console.log("작업 완료");}); 
-  }
+      });
+      setPageReady(true);
+
+  };
 
 
   useEffect(() => {
@@ -140,12 +147,6 @@ export default function MainPage({ navigation }) {
         color: "red",
       },
     });
-
-    //   firebase_db.ref("usersData/" + userId).once("value").then((snapshot) => {
-    //   let fav = snapshot.val();
-    //   let fav_list = Object.keys(fav);
-    //   let fav_id = Object.values(fav);
-    // })
 
     firebase_db
    .ref("users/" + userId)
@@ -159,7 +160,7 @@ export default function MainPage({ navigation }) {
    } else {console.log('초기값 불러올거 없음')}
    
   })
-  }, []);
+  }, [isFocused]);
 
   return (
     <SafeAreaView style={styles.containerSafe}>
@@ -185,24 +186,21 @@ export default function MainPage({ navigation }) {
           <TouchableOpacity
             style={styles.myButton}
             onPress={() => {
-              setTimeout(()=>getFav(),1000 )
-              setTimeout(()=>MatchDataLoading(),2000)
-              setTimeout(()=>dataReady(),4000)
+              if (fav_list.length > 0) {
+                setTimeout(()=>getFav(),500 );
+                setTimeout(()=>MatchDataLoading(),1000);
+                setTimeout(()=>dataReady(),1500);} else {
+                  alert('오류!')
+                }
+              
             }}
           >
-            <Text style={styles.myPageButtonText}>전적검색</Text>
+            {pageReady? <Text style={styles.myPageButtonText} >전적검색</Text> : <Text style={styles.myPageButtonText} >검색중</Text> } 
+            {/* <Text style={styles.myPageButtonText}>전적검색</Text> */}
           </TouchableOpacity>
         </View>
         <View style={{ alignItems: "center", marginVertical: 20 }}>
-          {/* <TouchableOpacity onPress={()=>{getFav()}}><Text>get Fav</Text></TouchableOpacity>
-          <TouchableOpacity onPress={()=>{MatchDataLoading()}}><Text>MatchDataLoading</Text></TouchableOpacity>
-          <TouchableOpacity onPress={()=>{dataReady()}}><Text>dataReady</Text></TouchableOpacity>
-          <TouchableOpacity onPress={()=>{
-            
-            setTimeout(()=>getFav(),500)
-            setTimeout(()=>MatchDataLoading(),2000)
-            setTimeout(()=>dataReady(),4000)
-            }}><Text>test33</Text></TouchableOpacity> */}
+
 
           <BannerAd
             unitId={TestIds.BANNER}
@@ -217,18 +215,6 @@ export default function MainPage({ navigation }) {
         </View>
 
         <View style={styles.cardContainer}>
-          {/* {totalData.map((content,i) => {
-            let date = new Date(content.info.gameEndTimestamp + 9 * 60 * 60 * 1000)
-            let dM = (date.getMonth() + 1).toString()
-            let dD = date.getDate().toString()
-            let dH = date.getHours().toString()
-            let dMin = date.getMinutes().toString()
-            let dateString = dM + '월' + dD + '일 ' + dH + '시' + dMin + '분'
-            
-
-            return <Text key={i}>{dateString}</Text> 
-                   })}*/}
-
           {totalData.map((content, i) => {
             return <Match content={content} key={i} navigation={navigation} />;
           })}

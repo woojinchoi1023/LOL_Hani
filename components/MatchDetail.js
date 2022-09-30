@@ -28,15 +28,20 @@ export default function MatchDetail({ nick, data, playerNumber }) {
     let kill = data[playerIndex]['kills']
     let death = data[playerIndex]['deaths']
     let assist = data[playerIndex]['assists']
+    let winResult = data[playerIndex]['win']
    
     
 
   return(  
     <View style={styles.container}>
+      <View style={{flexDirection:'row'}} >
         <Text style={{fontsize:15}}> {nick} ::</Text>
+        {winResult ? <Text style={{color:'red', fontWeight : 'bold'}}> 승리</Text>:<Text style={{color:'blue', fontWeight : 'bold'}}> 패배</Text>}
+      </View>
+        
 
         <View style={{flexDirection:'row'}}>
-            <Text style={{fontsize:15}}> {data[playerIndex]['individualPosition']} /</Text>
+            {data[playerIndex]['individualPosition']==='UTILITY'? <Text style={{fontsize:15}}> SUPPORT /</Text> : <Text style={{fontsize:15}}> {data[playerIndex]['individualPosition']} /</Text> }
             <Text style={{fontsize:15}}> {data[playerIndex]['championName']} /</Text>
             <Text style={{fontsize:15}}> {kill} /</Text>
             <Text style={{fontsize:15, color:'red', fontWeight:'bold'}}> {death}</Text>

@@ -32,8 +32,11 @@ export default function Match({ content, navigation }) {
     let dMin = date.getMinutes().toString()
     let dateString = dM + '월 ' + dD + '일 ' + dH + '시 ' + dMin + '분'
 
+    
+
     const userId = Application.androidId;
     const [myFavList, setMyFavList] = useState([])
+
     let allPlayer = content.info.participants
     
     firebase_db.ref('/users/' + userId).once('value').then((snapshot)=>{
@@ -70,12 +73,28 @@ export default function Match({ content, navigation }) {
         // console.log(participantList.includes(fav))
         if( participantList.includes(fav)) {
             watch.push(fav)
+            // console.log(allPlayer[playerNumber[fav]]['win'])
+            // setWinResult(allPlayer[playerNumber[fav]]['win'])
+            
         }
+                // console.log(watch)
+        
     })
 
 
+    //승패 여부 
+    // let winResult = allPlayer[watch[0]]['win']
+    // console.log(watch)
+    // setWinResult(allPlayer[playerNumber[fav]]['win'])
+    let winResult = 'true'
+    // if (allPlayer[watch[0]]['win'] === 'true') {winResult = 'true'} else {winResult = 'false'}
+    // winResult = allPlayer[watch[0]]['win']
+    let backColor
+    if (winResult==='true') {backColor = styles.container} else {backColor = styles.containerLose}
+    
+
   return(  
-    <View style={styles.container}>
+    <View style={backColor}>
         <View style={{flexDirection:'row'}}>
             {watch.map((nickname,i)=>{
                 return <Text style={{fontSize:20, fontWeight:'bold'}}key={i}>{nickname} </Text>
@@ -99,7 +118,14 @@ export default function Match({ content, navigation }) {
 
 const styles = StyleSheet.create({
     container:{
-        backgroundColor:'skyblue',
+        backgroundColor:'silver',
+        margin: 10,
+        borderRadius: 20,
+        padding: 20
+
+    },
+    containerLose:{
+        backgroundColor:'pink',
         margin: 10,
         borderRadius: 20,
         padding: 20
