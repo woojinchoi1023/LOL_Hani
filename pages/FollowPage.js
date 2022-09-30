@@ -85,21 +85,21 @@ export default function FollowPage({ route }) {
       let userInfo = await axios.get(tierUrl);
       setTier(userInfo.data[0]["tier"]);
       setTierData(userInfo.data);
-      console.log(tierUrl)
+      // console.log(tierUrl)
     } catch (err) {
       console.log("티어로딩 실패");
     }
   };
 
   const addFollow = () => {
-    if (followNames.length > 4) {
+    try{if (followNames.length > 4) {
       alert("최대 5명까지 팔로우 할 수 있습니다.");
     } else {
       firebase_db.ref("users/" + userId + "/" + nickname).set(bigData.puuid);
       alert("팔로우 성공");
     }
 
-    loadFollowList();
+    loadFollowList();} catch (err) {alert('오류!')}
   };
 
   useEffect(() => {

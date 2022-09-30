@@ -36,6 +36,9 @@ export default function MainPage({ navigation }) {
 
   let riotApiKey = "RGAPI-1de6a553-746c-49bc-ab40-546c6d6ed8a9";
 
+  let async = require("async");
+
+
 
 
   const clearAll = () => {
@@ -91,6 +94,8 @@ export default function MainPage({ navigation }) {
   };
 
   const MatchDataLoading = () => {
+    console.log('matchdataloading')
+
     firebase_db.ref("userData/" + userId).once("value").then((snapshot) => {
       let matchList = Object.keys(snapshot.val())
       matchList.map((matchCode)=> {
@@ -101,6 +106,7 @@ export default function MainPage({ navigation }) {
   };
 
   const dataReady = () => {
+    console.log('dataReady')
     firebase_db
       .ref("/userMatchData/" + userId)
       .once("value")
@@ -111,6 +117,18 @@ export default function MainPage({ navigation }) {
         console.log("데이터준비완료 !!!!");
       });
   };
+
+  const completePack = () => {
+    async.waterfall([
+      getFav,
+      MatchDataLoading,
+      dataReady
+    ], function (err, result) {
+      if(err)
+      console.log(err);
+  else
+      console.log("작업 완료");}); 
+  }
 
 
   useEffect(() => {
@@ -128,6 +146,19 @@ export default function MainPage({ navigation }) {
     //   let fav_list = Object.keys(fav);
     //   let fav_id = Object.values(fav);
     // })
+
+    firebase_db
+   .ref("users/" + userId)
+   .once("value")
+   .then((snapshot) => {
+   let fav = snapshot.val();
+   if (!(fav===null)) {
+    setfav_list(Object.keys(fav))
+    setfav_id(Object.values(fav))
+    console.log('초기값 불러왔음')
+   } else {console.log('초기값 불러올거 없음')}
+   
+  })
   }, []);
 
   return (
@@ -153,19 +184,26 @@ export default function MainPage({ navigation }) {
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.myButton}
-            onPress={async () => {
-              await getFav();
-              await MatchDataLoading();
-              await dataReady();
+            onPress={() => {
+              setTimeout(()=>getFav(),1000 )
+              setTimeout(()=>MatchDataLoading(),2000)
+              setTimeout(()=>dataReady(),4000)
             }}
           >
             <Text style={styles.myPageButtonText}>전적검색</Text>
           </TouchableOpacity>
         </View>
         <View style={{ alignItems: "center", marginVertical: 20 }}>
-          <TouchableOpacity onPress={()=>{getFav()}}><Text>get Fav</Text></TouchableOpacity>
+          {/* <TouchableOpacity onPress={()=>{getFav()}}><Text>get Fav</Text></TouchableOpacity>
           <TouchableOpacity onPress={()=>{MatchDataLoading()}}><Text>MatchDataLoading</Text></TouchableOpacity>
           <TouchableOpacity onPress={()=>{dataReady()}}><Text>dataReady</Text></TouchableOpacity>
+          <TouchableOpacity onPress={()=>{
+            
+            setTimeout(()=>getFav(),500)
+            setTimeout(()=>MatchDataLoading(),2000)
+            setTimeout(()=>dataReady(),4000)
+            }}><Text>test33</Text></TouchableOpacity> */}
+
           <BannerAd
             unitId={TestIds.BANNER}
             size={BannerAdSize.LARGE_BANNER}
