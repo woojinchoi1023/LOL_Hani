@@ -203,7 +203,7 @@ export default function MainPage({ navigation, route }) {
 
 
           <BannerAd
-            unitId={TestIds.BANNER}
+            unitId={'ca-app-pub-7815580729420007/1742302091'}
             size={BannerAdSize.LARGE_BANNER}
             requestOptions={{
               requestNonPersonalizedAdsOnly: true,
