@@ -38,15 +38,14 @@ export default function MainPage({ navigation, route }) {
   const [pageReady, setPageReady] = useState(false);
   const isFocused = useIsFocused();
 
-  let riotApiKey = "RGAPI-1f583055-b3bc-4c17-8919-6551e2f14a25";
-
+  // let riotApiKey = "RGAPI-1f583055-b3bc-4c17-8919-6551e2f14a25";
+  let riotApiKey
+  firebase_db.ref("API").once("value").then((snapshot)=>{
+    riotApiKey = snapshot.val()
+    console.log(riotApiKey)
+    console.log('api키 불러오기 완료')
+  })
  
-
-
-
-
-
-
   const clearAll = () => {
     firebase_db.ref().remove()
   }
@@ -160,6 +159,8 @@ export default function MainPage({ navigation, route }) {
    setPageReady(true)
 
   })
+
+  
   }, [isFocused]);
 
   return (
@@ -201,9 +202,9 @@ export default function MainPage({ navigation, route }) {
         </View>
         <View style={{ alignItems: "center", marginVertical: 20 }}>
 
-
+{/* ca-app-pub-7815580729420007/1742302091 */}
           <BannerAd
-            unitId={'ca-app-pub-7815580729420007/1742302091'}
+            unitId={'ca-app-pub-3940256099942544/6300978111'}
             size={BannerAdSize.LARGE_BANNER}
             requestOptions={{
               requestNonPersonalizedAdsOnly: true,
