@@ -35,10 +35,10 @@ export default function MainPage({ navigation, route }) {
   
   const [fav_list, setfav_list] = useState([]);
   const [fav_id, setfav_id] = useState([]);
-  const [pageReady, setPageReady] = useState(true);
+  const [pageReady, setPageReady] = useState(false);
   const isFocused = useIsFocused();
 
-  let riotApiKey = "RGAPI-1de6a553-746c-49bc-ab40-546c6d6ed8a9";
+  let riotApiKey = "RGAPI-1f583055-b3bc-4c17-8919-6551e2f14a25";
 
  
 
@@ -70,21 +70,19 @@ export default function MainPage({ navigation, route }) {
 
     firebase_db.ref("userData/"+userId).remove() // 초기화
 
-    firebase_db
-   .ref("users/" + userId)
-   .once("value")
-   .then((snapshot) => {
-   let fav = snapshot.val();
-   if (fav===null) {
-    console.log('getfav 오류')
-   } else {
-    setTimeout(()=>
-      setfav_list(Object.keys(fav)),100)
-    setfav_id(Object.values(fav))
-    
-  }
-  
-   })
+  //   firebase_db
+  //  .ref("users/" + userId)
+  //  .once("value")
+  //  .then((snapshot) => {
+  //  let fav = snapshot.val();
+  //  if (fav===null) {
+  //   console.log('getfav 오류')
+  //  } else {
+  //   setTimeout(()=>
+  //     setfav_list(Object.keys(fav)),100)
+  //   setfav_id(Object.values(fav))
+  // }
+  //  })
 
    
    fav_id.map((content,i)=>{
@@ -140,11 +138,11 @@ export default function MainPage({ navigation, route }) {
 
   useEffect(() => {
     navigation.setOptions({
-      title: "롤추적기 : 자기야 어제 게임했어?",
+      title: "롤하니 : 친구들 전적 모아보기",
       headerTitleStyle: {
         fontSize: 25,
         fontWeight: "bold",
-        color: "red",
+        color: "black",
       },
     });
 
@@ -157,8 +155,10 @@ export default function MainPage({ navigation, route }) {
     setfav_list(Object.keys(fav))
     setfav_id(Object.values(fav))
     console.log('초기값 불러왔음')
+    
    } else {console.log('초기값 불러올거 없음')}
-   
+   setPageReady(true)
+
   })
   }, [isFocused]);
 
@@ -195,7 +195,7 @@ export default function MainPage({ navigation, route }) {
               
             }}
           >
-            {pageReady? <Text style={styles.myPageButtonText} >전적검색</Text> : <Text style={styles.myPageButtonText} >검색중</Text> } 
+            {pageReady? <Text style={styles.myPageButtonText} >전적검색</Text> : <Text style={styles.myPageButtonText} >로딩중</Text> } 
             {/* <Text style={styles.myPageButtonText}>전적검색</Text> */}
           </TouchableOpacity>
         </View>
@@ -209,9 +209,9 @@ export default function MainPage({ navigation, route }) {
               requestNonPersonalizedAdsOnly: true,
             }}
           />
-          <TouchableOpacity onPress={()=>{clearAll()}}>
+          {/* <TouchableOpacity onPress={()=>{clearAll()}}>
             <Text> clear all </Text>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
         </View>
 
         <View style={styles.cardContainer}>

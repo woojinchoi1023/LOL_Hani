@@ -3,24 +3,43 @@ import {View, Image, Text, StyleSheet,TouchableOpacity} from 'react-native'
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 export default function Card({content,navigation}) {
-    let teamId = content.teamId
+    let teamWin = content.win
     let teamStyle
-    if (teamId === 100 ) {teamStyle=styles.card} else {teamStyle=styles.card2}
-    let roundTotalDamage = content.challenges.damageTakenOnTeamPercentage.toFixed(2)
-    let giveDamage = content.challenges.teamDamagePercentage.toFixed(2)
-
+    if (teamWin ) {teamStyle=styles.card} else {teamStyle=styles.card2}
+    let DamageTakenPercent = content.challenges.damageTakenOnTeamPercentage.toFixed(2)
+    let DamageDealtPercent = content.challenges.teamDamagePercentage.toFixed(2)
+    let myLane = content.individualPosition === 'UTILITY' ? myLane = 'SUPPORT' : myLane = content.individualPosition
+    let cs = content.neutralMinionsKilled + content.totalMinionsKilled
+    let playtime =parseInt( content.timePlayed / 60 )
+    let csPerMin = (cs / playtime).toFixed(1)
+    let carry
+    let criteria = parseFloat(DamageTakenPercent) + parseFloat(DamageDealtPercent)
+    if (criteria > 0.5) {carry = '캐리'} else if (criteria > 0.3) {carry = '1인분'} else if (criteria > 0.2) {carry ='버스'} else {carry ='트롤'}
     return(
             <View style={teamStyle}>
         
-            <Text style={styles.cardTitle2}>{content.lane} - {content.championName}</Text>
-            <Text style={styles.cardTitle}>{content.summonerName} </Text>
-            <View style={styles.desc}>
-              <Text style={styles.cardK} > {content.kills} /</Text>
-              <Text style={styles.cardD}> {content.deaths} </Text>
-              <Text style={styles.cardA}>/ {content.assists} </Text>
-              <Text style={styles.cardA}> 딜 비율: {giveDamage}</Text>
-              <Text style={{ color: 'red'}} numberOfLines={1}>  피해 비율: {roundTotalDamage }</Text>
-            </View>
+              <Text style={styles.cardTitle2}>{myLane} - {content.championName}</Text>
+              <View style={styles.desc}>
+                <Text style={styles.cardTitle}>{content.summonerName} => </Text>
+                <Text style={{fontSize:20, color:'red', fontWeight:'bold'}}>{carry}</Text>
+              </View>
+              
+              <View style={styles.desc}>
+                <Text style={styles.cardA}> LV.</Text>
+                <Text style={{color:'black',fontWeight:'bold',fontSize:15}}>{content.champLevel}</Text>
+                <Text style={styles.cardA}> KDA</Text>
+                <Text style={styles.cardK} > {content.kills} /</Text>
+                <Text style={styles.cardD}> {content.deaths} </Text>
+                <Text style={styles.cardA}>/ {content.assists} </Text>
+                <Text style={styles.cardA}> CS</Text>
+                <Text style={{ color: 'black',fontWeight:'bold',fontSize:15}}> {cs}</Text>
+                <Text style={styles.cardA}> ({csPerMin}/분)</Text>
+              </View>
+              <View style={styles.desc}>
+                <Text style={styles.cardA}>딜량 : {content.totalDamageDealtToChampions}</Text>
+                <Text style={styles.cardA}>  피해량 : {content.totalDamageTaken}</Text>
+              </View>
+              
             </View>
 
         
@@ -34,11 +53,14 @@ const styles = StyleSheet.create({
         //컨텐츠들을 가로로 나열
         //세로로 나열은 column <- 디폴트 값임 
         flexDirection:"column",
-        margin:10,
+        margin:5,
         borderBottomWidth:0.5,
         borderBottomColor:"#eee",
         paddingBottom:10,
-        backgroundColor:'skyblue'
+        backgroundColor:'skyblue',
+        borderRadius:20,
+        padding:10,
+
     
       },
 
@@ -47,11 +69,13 @@ const styles = StyleSheet.create({
         //컨텐츠들을 가로로 나열
         //세로로 나열은 column <- 디폴트 값임 
         flexDirection:"column",
-        margin:10,
+        margin:5,
         borderBottomWidth:0.5,
         borderBottomColor:"#eee",
         paddingBottom:10,
-        backgroundColor:'pink'
+        backgroundColor:'pink',
+        borderRadius:20,
+        padding:10,
     
       },
       

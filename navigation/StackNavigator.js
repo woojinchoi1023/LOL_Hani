@@ -7,6 +7,7 @@ import MainPage from "../pages/MainPage";
 import MyPage from "../pages/MyPage";
 import SearchPage from "../pages/SearchPage";
 import FollowPage from "../pages/FollowPage";
+import MatchFull from "../pages/MatchFull";
 
 //스택 네비게이션 라이브러리가 제공해주는 여러 기능이 담겨있는 객체를 사용합니다
 //그래서 이렇게 항상 상단에 선언하고 시작하는게 규칙입니다!
@@ -36,6 +37,7 @@ const StackNavigator = () => {
       <Stack.Screen name="MyPage" component={MyPage} />
       <Stack.Screen name="SearchPage" component={SearchPage} />
       <Stack.Screen name="FollowPage" component={FollowPage} />
+      <Stack.Screen name="MatchFull" component={MatchFull} />
     </Stack.Navigator>
   );
 };
