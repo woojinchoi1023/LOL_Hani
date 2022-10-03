@@ -29,6 +29,7 @@ export default function Match({ content, navigation }) {
   let dH = date.getHours().toString();
   let dMin = date.getMinutes().toString();
   let dateString = dM + "월 " + dD + "일 " + dH + "시 " + dMin + "분";
+  let gameType = content.info.mapId
 
   const userId = Application.androidId;
   const [myFavList, setMyFavList] = useState([]);
@@ -59,8 +60,8 @@ export default function Match({ content, navigation }) {
   let participantList = [];
   let playerNumber = {};
   allPlayer.map((playerIndex, i) => {
-    participantList.push(playerIndex.summonerName.toLowerCase());
-    playerNumber[playerIndex.summonerName.toLowerCase()] = i;
+    participantList.push(playerIndex.summonerName.toLowerCase().replace(/(\s*)/g, ""));
+    playerNumber[playerIndex.summonerName.toLowerCase().replace(/(\s*)/g, "")] = i;
   });
   // console.log(participantList)
   // console.log(playerNumber)
@@ -116,6 +117,7 @@ export default function Match({ content, navigation }) {
                 data={allPlayer}
                 playerNumber={playerNumber}
                 key={i}
+                gameType={gameType}
               />
             );
           })}

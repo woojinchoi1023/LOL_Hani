@@ -42,7 +42,7 @@ export default function MainPage({ navigation, route }) {
   let riotApiKey
   firebase_db.ref("API").once("value").then((snapshot)=>{
     riotApiKey = snapshot.val()
-    console.log(riotApiKey)
+    // console.log(riotApiKey)
     console.log('api키 불러오기 완료')
   })
  
@@ -166,6 +166,11 @@ export default function MainPage({ navigation, route }) {
   return (
     <SafeAreaView style={styles.containerSafe}>
       <ScrollView style={styles.container}>
+        <View style={{marginHorizontal: 30, borderWidth:1, borderRadius:20, padding:10,backgroundColor:'lightgray'}}>
+          <Text style={{fontWeight:'bold', color:'red'}}>사용법</Text>
+          <Text>1. 팔로우를 눌러 유저 검색 및 팔로우</Text>
+          <Text>2. 전적검색</Text>
+        </View>
         {/* <Text style={styles.title}>누물보?</Text> */}
         <View style={styles.myPageGroup}>
           {/* <TouchableOpacity
@@ -201,7 +206,17 @@ export default function MainPage({ navigation, route }) {
           </TouchableOpacity>
         </View>
         <View style={{ alignItems: "center", marginVertical: 20 }}>
-
+        <Text>내 팔로우 목록: </Text>
+        <View style={{marginVertical:5, flexDirection:'row'}}>
+          
+          {fav_list.map((content,i)=>{
+            
+            return <Text key={i}>{content} </Text>}
+              
+            )}
+          {fav_list.length===0 ?  <Text>팔로우 목록이 비었습니다. 위 팔로우 버튼을 눌러 추가하세요.</Text> : null}
+        </View>
+        
 {/* ca-app-pub-7815580729420007/1742302091 */}
           <BannerAd
             unitId={'ca-app-pub-3940256099942544/6300978111'}
@@ -213,9 +228,11 @@ export default function MainPage({ navigation, route }) {
           {/* <TouchableOpacity onPress={()=>{clearAll()}}>
             <Text> clear all </Text>
           </TouchableOpacity> */}
+  
         </View>
 
         <View style={styles.cardContainer}>
+          
           {totalData.map((content, i) => {
             return <Match content={content} key={i} navigation={navigation} />;
           })}

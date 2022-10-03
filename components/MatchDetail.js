@@ -22,13 +22,15 @@ import {
 } from "react-native-google-mobile-ads";
 
 
-export default function MatchDetail({ nick, data, playerNumber }) {
+export default function MatchDetail({ nick, data, playerNumber, gameType }) {
 
     let playerIndex = playerNumber[nick]
     let kill = data[playerIndex]['kills']
     let death = data[playerIndex]['deaths']
     let assist = data[playerIndex]['assists']
     let winResult = data[playerIndex]['win']
+    let gameName
+    if (gameType===12) {gameName='칼바람'} else {gameName='이벤트'}
    
     
 
@@ -41,7 +43,8 @@ export default function MatchDetail({ nick, data, playerNumber }) {
         
 
         <View style={{flexDirection:'row'}}>
-            {data[playerIndex]['individualPosition']==='UTILITY'? <Text style={{fontsize:15}}> SUPPORT /</Text> : <Text style={{fontsize:15}}> {data[playerIndex]['individualPosition']} /</Text> }
+            
+            { gameType===11? data[playerIndex]['individualPosition']==='UTILITY'? <Text style={{fontsize:15}}> SUPPORT /</Text> : <Text style={{fontsize:15}}> {data[playerIndex]['individualPosition']} /</Text> : <Text style={{fontsize:15}}> {gameName} /</Text>}
             <Text style={{fontsize:15}}> {data[playerIndex]['championName']} /</Text>
             <Text style={{fontsize:15}}> {kill} /</Text>
             <Text style={{fontsize:15, color:'red', fontWeight:'bold'}}> {death}</Text>
