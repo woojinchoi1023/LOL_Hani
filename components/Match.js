@@ -36,6 +36,7 @@ export default function Match({ content, navigation }) {
 
   let allPlayer = content.info.participants;
 
+
   firebase_db
     .ref("/users/" + userId)
     .once("value")
@@ -67,6 +68,7 @@ export default function Match({ content, navigation }) {
   // console.log(playerNumber)
   // console.log('end')
   let watch = [];
+  let winResult = "true";
   myFavList.map((fav) => {
     // console.log(fav)
     // console.log(participantList.includes(fav))
@@ -74,6 +76,8 @@ export default function Match({ content, navigation }) {
       watch.push(fav);
       // console.log(allPlayer[playerNumber[fav]]['win'])
       // setWinResult(allPlayer[playerNumber[fav]]['win'])
+
+
     }
     // console.log(watch)
   });
@@ -82,9 +86,12 @@ export default function Match({ content, navigation }) {
   // let winResult = allPlayer[watch[0]]['win']
   // console.log(watch)
   // setWinResult(allPlayer[playerNumber[fav]]['win'])
-  let winResult = "true";
+  
   // if (allPlayer[watch[0]]['win'] === 'true') {winResult = 'true'} else {winResult = 'false'}
   // winResult = allPlayer[watch[0]]['win']
+
+  
+
   let backColor;
   if (winResult === "true") {
     backColor = styles.container;
@@ -107,6 +114,7 @@ export default function Match({ content, navigation }) {
               </Text>
             );
           })}
+          <Text style={{fontSize:13, color: 'lightgray', alignSelf:'center'}}>자세히</Text>
         </View>
         <Text>{dateString}</Text>
         <View>
@@ -134,7 +142,7 @@ export default function Match({ content, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "skyblue",
+    backgroundColor: `#ffa07a`,
     margin: 10,
     borderRadius: 20,
     padding: 20,
