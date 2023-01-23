@@ -22,15 +22,13 @@ import {
 } from "react-native-google-mobile-ads";
 
 
-export default function MatchDetail({ nick, data, playerNumber, gameType }) {
+export default function MatchDetail({ nick, data, playerNumber }) {
 
-    let playerIndex = playerNumber[nick]
-    let kill = data[playerIndex]['kills']
-    let death = data[playerIndex]['deaths']
-    let assist = data[playerIndex]['assists']
-    let winResult = data[playerIndex]['win']
-    let gameName
-    if (gameType===12) {gameName='칼바람'} else {gameName='이벤트'}
+    let playerIndex = playerNumber;
+    let kill = data[playerIndex]['kills'];
+    let death = data[playerIndex]['deaths'];
+    let assist = data[playerIndex]['assists'];
+
    
     
 
@@ -38,13 +36,12 @@ export default function MatchDetail({ nick, data, playerNumber, gameType }) {
     <View style={styles.container}>
       <View style={{flexDirection:'row'}} >
         <Text style={{fontsize:15}}> {nick} ::</Text>
-        {winResult ? <Text style={{color:'red', fontWeight : 'bold'}}> 승리</Text>:<Text style={{color:'blue', fontWeight : 'bold'}}> 패배</Text>}
       </View>
         
 
         <View style={{flexDirection:'row'}}>
             
-            { gameType===11? data[playerIndex]['individualPosition']==='UTILITY'? <Text style={{fontsize:15}}> SUPPORT /</Text> : <Text style={{fontsize:15}}> {data[playerIndex]['individualPosition']} /</Text> : <Text style={{fontsize:15}}> {gameName} /</Text>}
+            {data[playerIndex]['individualPosition']==='UTILITY'? <Text style={{fontsize:15}}> SUPPORT /</Text> : <Text style={{fontsize:15}}> {data[playerIndex]['individualPosition']} /</Text> }
             <Text style={{fontsize:15}}> {data[playerIndex]['championName']} /</Text>
             <Text style={{fontsize:15}}> {kill} /</Text>
             <Text style={{fontsize:15, color:'red', fontWeight:'bold'}}> {death}</Text>

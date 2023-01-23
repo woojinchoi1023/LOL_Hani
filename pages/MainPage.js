@@ -29,63 +29,153 @@ export default function MainPage({ navigation, route }) {
   const userId = Application.androidId;
   const isFocused = useIsFocused();
   const [matchDataUpdateAble, setMatchDataUpdateAble] = useState(true); //전적검색 연타 방지
-  const [followList, setFollowList] = useState(['asd']);
+  const [followList, setFollowList] = useState([
+    [
+      "Ktxp_0nV4X0nrl6xnfw1W6iyNo0LB39Xy8SKeHokUIG3ZF-qGhYpQBRUB-BJRhZIxorB0fFPv5CZlQ",
+      "맛우진",
+    ],
+    [
+      "8kwUoocjv9lSwDIC-A8EUsRjkah2nXnvOX9gYdCaehDx6cbr90JXmL6op2FulymtLgyPuW-Wsn60MQ",
+      "SSUB",
+    ],
+  ]);
   const [mathcData, setMatchData] = useState([]);
-  
-  const initialLoad = () => {
+  const [finalData, setFinalData] = useState([]);
+  const getMatchDataUrl =
+    "https://asia.api.riotgames.com/lol/match/v5/matches/";
+  let riotApiKey;
+  let gatheredData = []; //여러명의 데이터를 합친 것
+  let sortedData = []; //중복 제거와 정렬을 마친 최종 데이터
+
+  function initialLoad() {
     console.log("initial Load");
-  };
+    setMatchDataUpdateAble(true);
+  }
 
-  const updateFollowList = (userId) => {
+  function updateFollowList(userId) {
     console.log("update follow list");
-  };
-  
-  const getAlreadyExistData = () => {
+  }
+
+  function getApiKey() {
     return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        return resolve(console.log('1. getAlreadyExistData'));
-        
-      }, 1000);
+      firebase_db
+        .ref("API")
+        .once("value")
+        .then((snapshot) => {
+          riotApiKey = snapshot.val();
+          console.log("1. api키 불러오기 완료");
+        });
+      resolve();
     });
   }
 
-  const searchRecentMatch = () => {
-    return new Promise((resolve, reject) => {
-      setTimeout(() => {
-        return resolve(console.log('2. searchRecentMatch'));
-      }, 0);
-    });
-  }
-  
-  const sortByTime = () => {
-    console.log('4. sorting')
-    return 1;
+  async function getData(followArr) {
+    console.log("0. getData");
+    const nowTime = new Date();
+
+    const dummy = await getApiKey();
+
+    for (const arr of followArr) {
+      const puuid = arr[0];
+      const nickname = arr[1];
+      let newMatchList;
+      let data;
+      let dataToArray = []; //obj 인 데이터를 arr로 바꿈
+
+      console.log("nickname :>> ", nickname);
+
+      firebase_db
+        .ref("/newDB")
+        .child(puuid)
+        .child("lastUpdate")
+        .set(nowTime.toString()); //업뎃기록
+      let newMatchListJSON = await axios.get(
+        "https://asia.api.riotgames.com/lol/match/v5/matches/by-puuid/" +
+          puuid +
+          "/ids" +
+          "?api_key=" +
+          riotApiKey +
+          "&start=0&count=5"
+      );
+      newMatchList = newMatchListJSON.data;
+      console.log("2. newMatchList :>> ", newMatchList);
+      let preUserMatchJSON = await firebase_db
+        .ref("/newDB")
+        .child(puuid)
+        .child("match")
+        .get();
+      data = preUserMatchJSON.val(); //원래있던데이터
+      if (data) {
+        dataToArray = Object.entries(data); //[[key,val],[matchId,matchData]]
+      }
+      for (const matchId of newMatchList) { //새로운 매치 업로드
+        if (dataToArray.flat().includes(matchId)) {
+          //이미 있으면
+          console.log("매치 정보가 이미 있습니다");
+          continue;
+        } else {
+          //없으면
+          console.log('새로운 매치 정보');
+          axios
+            .get(getMatchDataUrl + matchId + "?api_key=" + riotApiKey)
+            .then((res) => {
+              dataToArray.push([matchId, res.data]); //추가
+              firebase_db
+                .ref("/newDB")
+                .child(puuid)
+                .child("match")
+                .child(matchId)
+                .set(res.data); //업로드
+            });
+        }
+      }
+      dataToArray.forEach((arr, i) => {
+        gatheredData.push(arr);
+      });
+    }
+    
+    
+    //합치기
+    console.log("4. data collected!");
+    sortByTime();
   }
 
-  const showMatchList = async() => {
+  function sortByTime() {
+    console.log("5. sort by time");
+    gatheredData.sort(function(a, b) {
+      return b[1].info.gameCreation - a[1].info.gameCreation;
+    })
+    sortedData = gatheredData.filter((v, i) => 
+    gatheredData.findIndex(x => x[1].info.gameCreation == v[1].info.gameCreation) == i);
+    setFinalData(sortedData);
+  }
+  
+
+  async function showMatchList() {
     console.log("showMatchList!");
-    //팔로우목록 불러오기
-    if(followList.length === 0) {
-      alert('팔로우 목록이 비었습니다. 팔로우 버튼을 눌러 추가하세요.')
+    if (followList.length === 0) {
+      alert("팔로우 목록이 비었습니다. 팔로우 버튼을 눌러 추가하세요.");
       setMatchDataUpdateAble(true);
       return;
-    };
-    await getAlreadyExistData();
-    await searchRecentMatch(); //유저ID로 기존 데이터 갖고오기
-    //최근 게임 검색하기. 신규 추가 게임기록이면 데이터베이스에 추가 & 업로드
-    console.log('3.');
-    let finalData = sortByTime();
+    }
 
-    
+    await getData(followList);
+
     setTimeout(() => {
       setMatchDataUpdateAble(true);
-      console.log('change to true');
+      console.log("change able to true");
     }, 3000);
 
-    return finalData;
-  };
+    return;
+  }
 
   useEffect(() => {
+    //볼때마다
+    updateFollowList(userId); //내 팔로우 목록 업데이트
+  }, [isFocused]);
+
+  useEffect(() => {
+    //한번만
     navigation.setOptions({
       title: "롤하니 : 친구들 전적 모아보기",
       headerTitleStyle: {
@@ -94,9 +184,9 @@ export default function MainPage({ navigation, route }) {
         color: "black",
       },
     });
-    initialLoad(); //전에 봤던 전적 화면을 저장했다가 보여주는 기능
-    updateFollowList(userId); //내 팔로우 목록 업데이트
-  }, [isFocused]);
+    initialLoad(); //옛날에 본 화면 그대로 띄워주기
+    getApiKey();
+  }, []);
 
   return (
     <SafeAreaView style={styles.containerSafe}>
@@ -114,8 +204,13 @@ export default function MainPage({ navigation, route }) {
           <Text>내 팔로우 목록: </Text>
           <View style={{ marginVertical: 5, flexDirection: "row" }}>
             {followList.length ? (
-              followList.map((content, i) => { //map 은 리턴이 있고 forEach는 리턴이 없음!
-              return <Text style={{fontWeight:'bold'}} key={i}>{i + 1}. {content}  </Text>;
+              followList.map((content, i) => {
+                //map 은 리턴이 있고 forEach는 리턴이 없음!
+                return (
+                  <Text style={{ fontWeight: "bold" }} key={i}>
+                    {i + 1}. {content[1]}{" "}
+                  </Text>
+                );
               })
             ) : (
               <Text style={{ fontWeight: "bold" }}>
@@ -162,7 +257,11 @@ export default function MainPage({ navigation, route }) {
             />
           </View>
         </View>
-        <View style={styles.cardContainer}></View>
+        <View style={styles.cardContainer}>
+        {finalData.map((content, i) => {
+            return <Match content={content[1]} followList = {followList} key={i} navigation={navigation} />;
+          })}
+        </View>
       </ScrollView>
     </SafeAreaView>
   );

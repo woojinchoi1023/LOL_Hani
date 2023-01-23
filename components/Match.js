@@ -12,129 +12,79 @@ import { firebase_db } from "../firebaseConfig";
 import { SafeAreaView } from "react-native-safe-area-context";
 import MatchDetail from "./MatchDetail";
 
-import {
-  BannerAd,
-  BannerAdSize,
-  TestIds,
-  InterstitialAd,
-  AdEventType,
-  RewardedInterstitialAd,
-  RewardedAdEventType,
-} from "react-native-google-mobile-ads";
 
-export default function Match({ content, navigation }) {
+export default function Match({ content, followList, navigation }) {
   let date = new Date(content.info.gameEndTimestamp);
   let dM = (date.getMonth() + 1).toString();
   let dD = date.getDate().toString();
   let dH = date.getHours().toString();
   let dMin = date.getMinutes().toString();
   let dateString = dM + "월 " + dD + "일 " + dH + "시 " + dMin + "분";
-  let gameType = content.info.mapId
-
-  const userId = Application.androidId;
-  const [myFavList, setMyFavList] = useState([]);
+  let gameType; //자랭?솔랭?
+  let mainPlayer = []; //내가 팔로우 하는 사람 중 게임에서 등장하는 사람 [puuid, index]
+  let win = true;
+  let winStyle;
+  
+  followList.forEach((arr, i) => {
+    if (content.metadata.participants.includes(arr[0])) {
+      mainPlayer.push([arr[1], content.metadata.participants.indexOf(arr[0])]);
+    }
+  });
+  
+  win = content.info.participants[mainPlayer[0][1]].win;
+  winStyle = win? styles.container : styles.containerLose
+  switch (content.info.queueId) {
+    case 420:
+      gameType = '솔로랭크'
+      break;
+    case 440:
+      gameType = '자유랭크'
+      break;
+    case 450:
+      gameType = '칼바람'
+      break;
+    default:
+      gameType = 'Unknown'
+      break;
+  };
 
   let allPlayer = content.info.participants;
 
-
-  firebase_db
-    .ref("/users/" + userId)
-    .once("value")
-    .then((snapshot) => {
-      let temp = snapshot.val();
-      let temp2 = Object.keys(temp);
-      let temp3 = [];
-      temp2.map((name) => {
-        temp3.push(name.toLowerCase().replace(/(\s*)/g, ""));
-      });
-      setMyFavList(temp3);
-    });
-
-  // allPlayer.map((playerIndex)=>{
-  //     if (playerIndex.summonerName.toLowerCase() in myFavList) {
-  //         playerShow.push(playerIndex.summonerName)
-  //     } else {}
-  // })
-  // myFavList.map((player)=>{
-  //     if(player in content.info.participants)
-  // })
-  let participantList = [];
-  let playerNumber = {};
-  allPlayer.map((playerIndex, i) => {
-    participantList.push(playerIndex.summonerName.toLowerCase().replace(/(\s*)/g, ""));
-    playerNumber[playerIndex.summonerName.toLowerCase().replace(/(\s*)/g, "")] = i;
-  });
-  // console.log(participantList)
-  // console.log(playerNumber)
-  // console.log('end')
-  let watch = [];
-  let winResult = "true";
-  myFavList.map((fav) => {
-    // console.log(fav)
-    // console.log(participantList.includes(fav))
-    if (participantList.includes(fav)) {
-      watch.push(fav);
-      // console.log(allPlayer[playerNumber[fav]]['win'])
-      // setWinResult(allPlayer[playerNumber[fav]]['win'])
-
-
-    }
-    // console.log(watch)
-  });
-
-  //승패 여부
-  // let winResult = allPlayer[watch[0]]['win']
-  // console.log(watch)
-  // setWinResult(allPlayer[playerNumber[fav]]['win'])
   
-  // if (allPlayer[watch[0]]['win'] === 'true') {winResult = 'true'} else {winResult = 'false'}
-  // winResult = allPlayer[watch[0]]['win']
-
-  
-
-  let backColor;
-  if (winResult === "true") {
-    backColor = styles.container;
-  } else {
-    backColor = styles.containerLose;
-  }
-
   return (
     <TouchableOpacity
       onPress={() => {
         navigation.navigate("MatchFull", { data: allPlayer });
+        
       }}
     >
-      <View style={backColor}>
+      <View style={winStyle}>
         <View style={{ flexDirection: "row" }}>
-          {watch.map((nickname, i) => {
+          {mainPlayer.map((arr, i) => {
             return (
               <Text style={{ fontSize: 20, fontWeight: "bold" }} key={i}>
-                {nickname}{" "}
+                {arr[0]}{" "}
               </Text>
             );
           })}
-          <Text style={{fontSize:13, color: 'lightgray', alignSelf:'center'}}>자세히</Text>
+          <Text style={{fontSize:13, color: 'gray', alignSelf:'center'}}>자세히</Text>
         </View>
-        <Text>{dateString}</Text>
+        <View style={{ flexDirection: "row" }}  >
+          <Text>{dateString}, </Text>
+          <Text style={{ fontSize: 13, textAlignVertical: "center" }}>{gameType}</Text>
+        </View>
         <View>
-          {watch.map((nickname, i) => {
+          {mainPlayer.map((arr, i) => {
             return (
               <MatchDetail
-                nick={nickname}
+                nick={arr[0]}
                 data={allPlayer}
-                playerNumber={playerNumber}
+                playerNumber={arr[1]}
                 key={i}
-                gameType={gameType}
               />
             );
           })}
         </View>
-
-        {/* <Text>{watch}</Text> */}
-
-        {/* <Text>{participantList}</Text> */}
-        {/* <Text>{myFavList}</Text> */}
       </View>
     </TouchableOpacity>
   );
@@ -142,7 +92,7 @@ export default function Match({ content, navigation }) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: `#ffa07a`,
+    backgroundColor: 'skyblue',
     margin: 10,
     borderRadius: 20,
     padding: 20,
