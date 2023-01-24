@@ -22,23 +22,28 @@ import {
 } from "react-native-google-mobile-ads";
 
 
-export default function Follow({ content, ID, followNames, setFollowNames }) {
+export default function Follow({ content, ID, followNames, setFollowList, index  }) {
 
   const delFollow = ()=>{
-    firebase_db.ref("users/" + ID + "/" + content).remove();
-    let result = followNames.filter((data,i)=>{
-        return data !== content
-    })
-    setFollowNames(result)
-    alert('삭제 완료')
-
-    
+    console.log('ID :>> ', ID);
+    console.log('index :>> ', index);
+    firebase_db.ref('/newUsers').child(ID).child(index).remove().then(() => {
+      return firebase_db.ref('/newUsers').child(ID).get()
+      
+    }).catch((err) => {
+      
+    }).then((snapshot)=>{
+      setFollowList(snapshot.val());
+      alert('삭제 완료')
+      
+    });
+    console.log('delete!', followNames);
   }
 
   return(  
     <View style={styles.container}>
-        <Text>{content}</Text>
-        <TouchableOpacity style={styles.deleteButton} onPress={()=>{delFollow()}}>
+        <Text>{followNames}</Text>
+        <TouchableOpacity style={styles.deleteButton} onPress={delFollow}>
             <Text>삭제</Text>
         </TouchableOpacity>
     </View>

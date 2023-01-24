@@ -29,18 +29,11 @@ export default function MainPage({ navigation, route }) {
   const userId = Application.androidId;
   const isFocused = useIsFocused();
   const [matchDataUpdateAble, setMatchDataUpdateAble] = useState(true); //전적검색 연타 방지
-  const [followList, setFollowList] = useState([
-    [
-      "Ktxp_0nV4X0nrl6xnfw1W6iyNo0LB39Xy8SKeHokUIG3ZF-qGhYpQBRUB-BJRhZIxorB0fFPv5CZlQ",
-      "맛우진",
-    ],
-    [
-      "8kwUoocjv9lSwDIC-A8EUsRjkah2nXnvOX9gYdCaehDx6cbr90JXmL6op2FulymtLgyPuW-Wsn60MQ",
-      "SSUB",
-    ],
-  ]);
+  const [followList, setFollowList] = useState([]);
   const [mathcData, setMatchData] = useState([]);
   const [finalData, setFinalData] = useState([]);
+  const [apiKey, setApiKey] = useState('');
+  
   const getMatchDataUrl =
     "https://asia.api.riotgames.com/lol/match/v5/matches/";
   let riotApiKey;
@@ -54,6 +47,12 @@ export default function MainPage({ navigation, route }) {
 
   function updateFollowList(userId) {
     console.log("update follow list");
+    firebase_db.ref('/newUsers').child(userId).get().then((snapshot) => {
+      console.log('follow list result.val() :>> ', snapshot.val());
+      setFollowList(snapshot.val());
+    }).catch((err) => {
+      console.log('follow list update err :>> ', err);
+    });
   }
 
   function getApiKey() {
@@ -63,9 +62,11 @@ export default function MainPage({ navigation, route }) {
         .once("value")
         .then((snapshot) => {
           riotApiKey = snapshot.val();
+          setApiKey(snapshot.val());
           console.log("1. api키 불러오기 완료");
+          console.log('riotApiKey :>> ', riotApiKey);
+          resolve(snapshot.val());
         });
-      resolve();
     });
   }
 
@@ -73,7 +74,7 @@ export default function MainPage({ navigation, route }) {
     console.log("0. getData");
     const nowTime = new Date();
 
-    const dummy = await getApiKey();
+    riotApiKey = await getApiKey();
 
     for (const arr of followArr) {
       const puuid = arr[0];
@@ -96,7 +97,7 @@ export default function MainPage({ navigation, route }) {
           "?api_key=" +
           riotApiKey +
           "&start=0&count=5"
-      );
+      )
       newMatchList = newMatchListJSON.data;
       console.log("2. newMatchList :>> ", newMatchList);
       let preUserMatchJSON = await firebase_db
@@ -153,7 +154,7 @@ export default function MainPage({ navigation, route }) {
 
   async function showMatchList() {
     console.log("showMatchList!");
-    if (followList.length === 0) {
+    if (!followList) {
       alert("팔로우 목록이 비었습니다. 팔로우 버튼을 눌러 추가하세요.");
       setMatchDataUpdateAble(true);
       return;
@@ -169,13 +170,11 @@ export default function MainPage({ navigation, route }) {
     return;
   }
 
-  useEffect(() => {
-    //볼때마다
+  useEffect(() => {//볼때마다
     updateFollowList(userId); //내 팔로우 목록 업데이트
   }, [isFocused]);
 
-  useEffect(() => {
-    //한번만
+  useEffect(() => { //한번만
     navigation.setOptions({
       title: "롤하니 : 친구들 전적 모아보기",
       headerTitleStyle: {
@@ -203,12 +202,11 @@ export default function MainPage({ navigation, route }) {
         >
           <Text>내 팔로우 목록: </Text>
           <View style={{ marginVertical: 5, flexDirection: "row" }}>
-            {followList.length ? (
+            {followList ? (
               followList.map((content, i) => {
-                //map 은 리턴이 있고 forEach는 리턴이 없음!
                 return (
                   <Text style={{ fontWeight: "bold" }} key={i}>
-                    {i + 1}. {content[1]}{" "}
+                    {content[1]}{" "}
                   </Text>
                 );
               })
@@ -225,7 +223,7 @@ export default function MainPage({ navigation, route }) {
             onPress={() => {
               navigation.navigate("FollowPage", {
                 ID: userId,
-                riotApiKey: riotApiKey,
+                riotApiKey: apiKey,
               });
             }}
           >
